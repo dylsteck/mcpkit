@@ -10,3 +10,6 @@ generated-mcps/
 # mcpkit session data
 .mcpkit/
 
+# Generated MCP servers
+*_mcp_server/
+
