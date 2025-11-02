@@ -1,4 +1,4 @@
-import { Stagehand } from "@browserbasehq/stagehand";
+import { AvailableModel, Stagehand } from "@browserbasehq/stagehand";
 import { getOrCreateContext } from "../../services/session/index.js";
 import { loadEnv } from "../../config/env.js";
 
@@ -8,17 +8,20 @@ let stagehandInstance: Stagehand | null = null;
 
 export const getStagehandInstance = async (
   domain: string,
+  modelApiKey: string,
+  modelName: AvailableModel,
   options?: {
     persistContext?: boolean;
   }
 ) => {
   if (!stagehandInstance) {
-    const geminiApiKey =
-      process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!modelApiKey) {
+      throw new Error("Missing API key. Set an API key in your environment.");
+    }
 
-    if (!geminiApiKey) {
+    if (!modelName) {
       throw new Error(
-        "Missing Gemini API key. Set GEMINI_API_KEY or GOOGLE_GENERATIVE_AI_API_KEY in your environment."
+        "Missing model name. Set a model name in your environment."
       );
     }
 
@@ -53,8 +56,8 @@ export const getStagehandInstance = async (
       },
       cacheDir: `mcp-stagehand-${domain}`,
       model: {
-        modelName: "google/gemini-2.5-flash",
-        apiKey: geminiApiKey,
+        modelName: modelName,
+        apiKey: modelApiKey,
       },
     });
     await stagehandInstance.init();

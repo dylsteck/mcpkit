@@ -6,17 +6,9 @@ import {
   generateMCPServerCode,
   fixBuildErrors,
 } from "../../services/create/index.js";
-import { Stagehand } from "@browserbasehq/stagehand";
-
 import { getStagehandInstance } from "../../initalizers/stagehand/index.js";
+import { getDebugUrl } from "../../services/create/authentication/helpers.js";
 
-export function getDebugUrl(stagehand: Stagehand): string {
-  const sessionId = stagehand.browserbaseSessionId;
-  if (!sessionId) {
-    throw new Error("No active Browserbase session");
-  }
-  return `https://app.browserbase.com/sessions/${sessionId}`;
-}
 /**
  * Main create function
  */
@@ -27,7 +19,11 @@ export async function createMCPServer(
   const urlObj = new URL(url);
   const domain = urlObj.hostname;
 
-  const stagehand = await getStagehandInstance(domain);
+  const stagehand = await getStagehandInstance(
+    domain,
+    process.env.GEMINI_API_KEY!,
+    "google/gemini-2.5-flash"
+  );
 
   // Skip authentication if requested
   if (!options?.skipAuth) {
@@ -88,15 +84,7 @@ export async function createMCPServer(
   await fs.mkdir(path.join(outputDir, "src"), { recursive: true });
 
   // Generate all files
-  let { serverCode, packageJson, envExample, readme, tsconfig } =
-    await generateMCPServerCode(domain, url, actions);
-
-  // Write all files
-  await fs.writeFile(path.join(outputDir, "src", "index.ts"), serverCode);
-  await fs.writeFile(path.join(outputDir, "package.json"), packageJson);
-  await fs.writeFile(path.join(outputDir, ".env.example"), envExample);
-  await fs.writeFile(path.join(outputDir, "README.md"), readme);
-  await fs.writeFile(path.join(outputDir, "tsconfig.json"), tsconfig);
+  let serverCode = await generateMCPServerCode(domain, url, actions, outputDir);
 
   console.log(`\n✅ MCP server repository generated!`);
   console.log(`📁 Location: ${outputDir}\n`);
@@ -158,16 +146,15 @@ export async function createMCPServer(
         const fixedCode = await fixBuildErrors(
           serverCode,
           buildError,
-          domain,
-          url,
-          actions
+          actions,
+          outputDir
         );
 
-        // Write the fixed code
-        await fs.writeFile(path.join(outputDir, "src", "index.ts"), fixedCode);
-
-        // Update serverCode for potential next iteration
-        serverCode = fixedCode;
+        if (fixedCode !== serverCode) {
+          serverCode = fixedCode;
+        } else {
+          console.log("✅ No fixes applied, retrying build...\n");
+        }
 
         console.log("✅ Generated fixes applied, retrying build...\n");
       } catch (fixError) {
