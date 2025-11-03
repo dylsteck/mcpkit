@@ -5,6 +5,7 @@ import {
   loadContextId,
   createContext,
 } from "../../services/session/index.js";
+import { normalizeUrl } from "../../utils/url.js";
 import chalk from "chalk";
 
 /**
@@ -23,7 +24,7 @@ export async function listContexts(): Promise<void> {
 
   console.log(chalk.bold("\n📦 Saved Browser Contexts:\n"));
   contexts.forEach((ctx, index) => {
-    console.log(`${index + 1}. ${chalk.cyan(ctx.domain)}`);
+    console.log(`${index + 1}. ${chalk.cyan(normalizeUrl(ctx.domain))}`);
     console.log(`   Context ID: ${chalk.gray(ctx.contextId)}`);
   });
   console.log("");
@@ -32,7 +33,9 @@ export async function listContexts(): Promise<void> {
 /**
  * Delete a saved browser context
  */
-export async function deleteContext(domain?: string): Promise<void> {
+export async function deleteContext(domainOrUrl?: string): Promise<void> {
+  let domain: string | undefined = domainOrUrl;
+
   // If domain not provided, show list and let user select
   if (!domain) {
     const contexts = await listSavedContexts();
@@ -57,10 +60,11 @@ export async function deleteContext(domain?: string): Promise<void> {
       return;
     }
 
-    domain = contexts[response.contextIndex].domain;
+    domain = normalizeUrl(contexts[response.contextIndex].domain);
+  } else {
+    domain = normalizeUrl(domain);
   }
 
-  // Confirm deletion
   const confirmResponse = await prompts({
     type: "confirm",
     name: "confirmed",
@@ -78,7 +82,9 @@ export async function deleteContext(domain?: string): Promise<void> {
   await deleteContextId(domain);
   console.log(
     chalk.green(
-      `\n✅ Context for ${chalk.cyan(domain)} deleted successfully.\n`
+      `\n✅ Context for ${chalk.cyan(
+        normalizeUrl(domain)
+      )} deleted successfully.\n`
     )
   );
   console.log(
@@ -89,7 +95,9 @@ export async function deleteContext(domain?: string): Promise<void> {
 /**
  * Show details of a specific context
  */
-export async function showContext(domain?: string): Promise<void> {
+export async function showContext(domainOrUrl?: string): Promise<void> {
+  let domain: string | undefined = domainOrUrl;
+
   if (!domain) {
     const contexts = await listSavedContexts();
 
@@ -113,14 +121,20 @@ export async function showContext(domain?: string): Promise<void> {
       return;
     }
 
-    domain = contexts[response.contextIndex].domain;
+    domain = normalizeUrl(contexts[response.contextIndex].domain);
+  } else {
+    domain = normalizeUrl(domain);
   }
 
   const contextId = await loadContextId(domain);
 
   if (!contextId) {
     console.log(
-      chalk.red(`\n❌ No context found for domain: ${chalk.cyan(domain)}\n`)
+      chalk.red(
+        `\n❌ No context found for domain: ${chalk.cyan(
+          normalizeUrl(domain)
+        )}\n`
+      )
     );
     return;
   }
@@ -128,28 +142,21 @@ export async function showContext(domain?: string): Promise<void> {
   console.log(chalk.bold(`\n📦 Context for ${chalk.cyan(domain)}:\n`));
   console.log(`Domain:     ${chalk.cyan(domain)}`);
   console.log(`Context ID: ${chalk.gray(contextId)}`);
-  console.log(
-    `\nThis context stores browser state (cookies, localStorage, etc.) for ${domain}.`
-  );
-  console.log(
-    "It allows you to stay logged in across multiple mcpkit sessions.\n"
-  );
 }
 
-export async function createContextForDomain(domain: string): Promise<void> {
+export async function createContextForDomain(
+  domainOrUrl: string
+): Promise<void> {
+  const domain = normalizeUrl(domainOrUrl);
   const contextId = await createContext(domain);
   console.log(
     chalk.green(
-      `\n✅ Context for ${chalk.cyan(domain)} created successfully.\n`
+      `\n✅ Context for ${chalk.cyan(
+        normalizeUrl(domain)
+      )} created successfully.\n`
     )
   );
   console.log(`Context ID: ${chalk.gray(contextId)}`);
-  console.log(
-    `\nThis context stores browser state (cookies, localStorage, etc.) for ${domain}.`
-  );
-  console.log(
-    "It allows you to stay logged in across multiple mcpkit sessions.\n"
-  );
 }
 
 /**

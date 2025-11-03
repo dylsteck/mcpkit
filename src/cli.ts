@@ -3,6 +3,7 @@
 import { createMCPServer } from "./commands/create/index.js";
 import { manageContexts } from "./commands/contexts/index.js";
 import { setupSecrets, showSecrets } from "./commands/secrets/index.js";
+import { normalizeUrl, isValidUrlInput } from "./utils/url.js";
 import prompts from "prompts";
 
 const COMMANDS = {
@@ -21,12 +22,20 @@ Usage:
   mcpkit [command] [options]
 
 Commands:
-  secrets     ${COMMANDS.secrets}
-  create      ${COMMANDS.create}
-  contexts    ${COMMANDS.contexts}
-  help        ${COMMANDS.help}
-  version     ${COMMANDS.version}
+  secrets                    ${COMMANDS.secrets}
+  create [url]               ${COMMANDS.create}
+                             URL formats: https://example.com, www.example.com, or example.com
+  contexts [subcommand]      ${COMMANDS.contexts}
+                             Accepts domain or URL in any format
+  help                       ${COMMANDS.help}
+  version                    ${COMMANDS.version}
 
+Examples:
+  mcpkit create https://example.com
+  mcpkit create www.example.com
+  mcpkit create example.com
+  mcpkit contexts create example.com
+  mcpkit contexts delete https://example.com
 
 For more information, visit: https://github.com/kevoconnell/mcpkit
 `);
@@ -49,19 +58,16 @@ async function showVersion() {
 async function runCreate(url?: string, skipAuth?: boolean) {
   console.log("🔨 MCP Server Generator\n");
 
-  // If URL not provided, prompt for it
   if (!url) {
     const response = await prompts({
       type: "text",
       name: "url",
       message: "Enter the URL of the website to create an MCP for:",
       validate: (value) => {
-        try {
-          new URL(value);
+        if (isValidUrlInput(value)) {
           return true;
-        } catch {
-          return "Please enter a valid URL (e.g., https://mcpkit.sh)";
         }
+        return "Please enter a valid URL (e.g., https://example.com, www.example.com, or example.com)";
       },
     });
 
@@ -78,7 +84,9 @@ async function runCreate(url?: string, skipAuth?: boolean) {
     process.exit(1);
   }
 
-  await createMCPServer(url, { skipAuth });
+  const normalizedUrl = normalizeUrl(url);
+
+  await createMCPServer(normalizedUrl, { skipAuth });
 }
 
 async function main() {
