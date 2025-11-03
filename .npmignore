@@ -1,0 +1,39 @@
+# Source files
+src/
+tsconfig.json
+
+# Development files
+.env
+.env.example
+*.log
+
+# Generated MCP servers (examples)
+*_mcp_server/
+mcp-stagehand-*/
+
+# Documentation and examples
+docs/
+examples/
+*.png
+*.jpg
+*.jpeg
+HNMCP.png
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git files
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Misc
+claude.md
+.claude/
+node_modules/

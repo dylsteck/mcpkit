@@ -21,10 +21,24 @@
     "mcp",
     "stagehand",
     "browser-automation",
-    "ai"
+    "ai",
+    "model-context-protocol"
   ],
-  "author": "",
+  "author": "Kevin O'Connell",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinoconnell/mcpkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kevinoconnell/mcpkit/issues"
+  },
+  "homepage": "https://github.com/kevinoconnell/mcpkit#readme",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@browserbasehq/stagehand": "^3.0.1",
     "@modelcontextprotocol/sdk": "^1.0.0",
