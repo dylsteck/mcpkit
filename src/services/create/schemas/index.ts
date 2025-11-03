@@ -16,7 +16,7 @@ export const DiscoveredActionSchema = z.object({
       })
     )
     .optional(),
-  extractionSchema: z.record(z.string()).optional(),
+  extractionSchema: z.record(z.any()).optional(),
 });
 
 export const DiscoveredActionsResponseSchema = z.object({

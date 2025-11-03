@@ -56,7 +56,7 @@ async function showVersion() {
 }
 
 async function runCreate(url?: string, skipAuth?: boolean) {
-  console.log("🔨 MCP Server Generator\n");
+  console.log(`Making MCP server for ${url}...`);
 
   if (!url) {
     const response = await prompts({

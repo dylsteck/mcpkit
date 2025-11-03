@@ -224,22 +224,11 @@ Each action should have 4-8 detailed steps minimum. Break down the workflow into
 
 DO NOT RUSH. Quality and thoroughness over speed. Explore deeply before finalizing your list.
 
-Return ONLY the JSON object, no additional text.`,
+Return ONLY the JSON object starting with { and ending with }, like ${exampleJSON}, no additional text or markdown formatting should be present. DO NOT CLOSE UNLESS YOU HAVE COMPLETED THE EXPLORATION AND HAVE A VALID JSON OBJECT.`,
       maxSteps: 200,
     });
 
-    if (!result || typeof result !== "object") {
-      throw new Error("Agent execution returned invalid result");
-    }
-
-    if (!result.message) {
-      throw new Error(
-        "Agent execution returned result without message property"
-      );
-    }
-
     const responseMessage = result.message;
-    console.log(`\n📋 Raw agent response:\n${responseMessage}\n`);
 
     // Strip markdown code blocks if present
     let jsonString = responseMessage.trim();
@@ -250,14 +239,9 @@ Return ONLY the JSON object, no additional text.`,
     jsonString = jsonString.trim();
 
     if (!jsonString.startsWith("{")) {
-      console.log(
-        "⚠️  Agent response doesn't start with JSON, attempting to extract..."
-      );
-
       const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         jsonString = jsonMatch[0];
-        console.log("✓ Found JSON object in response");
       } else {
         throw new Error(
           `Agent returned non-JSON response. Response started with: "${jsonString.substring(
