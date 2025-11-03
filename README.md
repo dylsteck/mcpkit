@@ -11,7 +11,7 @@
 ### Installation
 
 ```bash
-npm install -g mcpkit
+npm install -g @kevinoconnell/mcpkit
 ```
 
 ### Setup
