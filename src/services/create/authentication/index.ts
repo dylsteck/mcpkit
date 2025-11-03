@@ -2,10 +2,7 @@ import { Stagehand } from "@browserbasehq/stagehand";
 
 import { StagehandPage } from "../schemas/index.js";
 
-import {
-  analyzeAuthenticationState,
-  logAuthenticationAnalysis,
-} from "./analysis.js";
+import { analyzeAuthenticationState } from "./analysis.js";
 import { waitForUserInput, openDebuggerUrl, getDebugUrl } from "./helpers.js";
 
 /**
@@ -35,8 +32,6 @@ export async function authenticateToWebsite(
     console.log("🔓 No authentication required.");
     return;
   }
-
-  logAuthenticationAnalysis(analysis, domain);
 
   // If there's a login button to click, click it first
   if (analysis.loginButton) {
