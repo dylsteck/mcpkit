@@ -9,17 +9,16 @@
  *
  * Returns: https://www.example.com (or https://example.com if no www)
  */
-export function normalizeUrl(input: string): string {
+export function normalizeUrl(input: string): URL {
   // Remove leading/trailing whitespace
   let url = input.trim();
 
   // If it already has a protocol, validate and return
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  if (url.startsWith("http://") || url.startsWith("https://")) {
     try {
-      new URL(url);
-      return url;
+      return new URL(url);
     } catch {
-      throw new Error('Invalid URL format');
+      throw new Error("Invalid URL format");
     }
   }
 
@@ -28,10 +27,11 @@ export function normalizeUrl(input: string): string {
 
   // Validate the constructed URL
   try {
-    new URL(url);
-    return url;
+    return new URL(url);
   } catch {
-    throw new Error('Invalid URL format. Please provide a valid URL (e.g., https://example.com, www.example.com, or example.com)');
+    throw new Error(
+      "Invalid URL format. Please provide a valid URL (e.g., https://example.com, www.example.com, or example.com)"
+    );
   }
 }
 

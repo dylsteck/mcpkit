@@ -86,7 +86,7 @@ async function runCreate(url?: string, skipAuth?: boolean) {
 
   const normalizedUrl = normalizeUrl(url);
 
-  await createMCPServer(normalizedUrl, { skipAuth });
+  await createMCPServer(normalizedUrl.href, { skipAuth });
 }
 
 async function main() {

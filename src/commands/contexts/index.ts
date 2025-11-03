@@ -5,7 +5,7 @@ import {
   loadContextId,
   createContext,
 } from "../../services/session/index.js";
-import { normalizeUrl } from "../../utils/url.js";
+import { isValidUrlInput, normalizeUrl } from "../../utils/url.js";
 import chalk from "chalk";
 
 /**
@@ -24,7 +24,7 @@ export async function listContexts(): Promise<void> {
 
   console.log(chalk.bold("\n📦 Saved Browser Contexts:\n"));
   contexts.forEach((ctx, index) => {
-    console.log(`${index + 1}. ${chalk.cyan(normalizeUrl(ctx.domain))}`);
+    console.log(`${index + 1}. ${chalk.cyan(ctx.domain)}`);
     console.log(`   Context ID: ${chalk.gray(ctx.contextId)}`);
   });
   console.log("");
@@ -60,9 +60,9 @@ export async function deleteContext(domainOrUrl?: string): Promise<void> {
       return;
     }
 
-    domain = normalizeUrl(contexts[response.contextIndex].domain);
+    domain = contexts[response.contextIndex].domain;
   } else {
-    domain = normalizeUrl(domain);
+    domain = normalizeUrl(domain).hostname;
   }
 
   const confirmResponse = await prompts({
@@ -82,9 +82,7 @@ export async function deleteContext(domainOrUrl?: string): Promise<void> {
   await deleteContextId(domain);
   console.log(
     chalk.green(
-      `\n✅ Context for ${chalk.cyan(
-        normalizeUrl(domain)
-      )} deleted successfully.\n`
+      `\n✅ Context for ${chalk.cyan(domain)} deleted successfully.\n`
     )
   );
   console.log(
@@ -121,9 +119,9 @@ export async function showContext(domainOrUrl?: string): Promise<void> {
       return;
     }
 
-    domain = normalizeUrl(contexts[response.contextIndex].domain);
+    domain = contexts[response.contextIndex].domain;
   } else {
-    domain = normalizeUrl(domain);
+    domain = normalizeUrl(domain).hostname;
   }
 
   const contextId = await loadContextId(domain);
@@ -131,9 +129,7 @@ export async function showContext(domainOrUrl?: string): Promise<void> {
   if (!contextId) {
     console.log(
       chalk.red(
-        `\n❌ No context found for domain: ${chalk.cyan(
-          normalizeUrl(domain)
-        )}\n`
+        `\n❌ No context found for domain: ${chalk.cyan(domain)}\n`
       )
     );
     return;
@@ -147,13 +143,11 @@ export async function showContext(domainOrUrl?: string): Promise<void> {
 export async function createContextForDomain(
   domainOrUrl: string
 ): Promise<void> {
-  const domain = normalizeUrl(domainOrUrl);
+  const domain = normalizeUrl(domainOrUrl).hostname;
   const contextId = await createContext(domain);
   console.log(
     chalk.green(
-      `\n✅ Context for ${chalk.cyan(
-        normalizeUrl(domain)
-      )} created successfully.\n`
+      `\n✅ Context for ${chalk.cyan(domain)} created successfully.\n`
     )
   );
   console.log(`Context ID: ${chalk.gray(contextId)}`);
@@ -173,8 +167,19 @@ export async function manageContexts(
 
     case "create":
       if (!domain) {
-        console.log(chalk.red("\nDomain is required.\n"));
-        return;
+        //prompt for domain
+        const response = await prompts({
+          type: "text",
+          name: "domain",
+          message: "Enter the domain of the website to create a context for:",
+          validate: (value) => {
+            if (isValidUrlInput(value)) {
+              return true;
+            }
+            return "Please enter a valid domain (e.g., example.com, www.example.com, or https://example.com)";
+          },
+        });
+        domain = normalizeUrl(response.domain).hostname;
       }
       await createContextForDomain(domain);
       break;
