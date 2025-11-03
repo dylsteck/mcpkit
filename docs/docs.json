@@ -40,7 +40,7 @@
           },
           {
             "group": "Advanced",
-            "pages": ["advanced/authentication", "development"]
+            "pages": ["advanced/authentication", "advanced/claude-code", "development"]
           }
         ]
       }

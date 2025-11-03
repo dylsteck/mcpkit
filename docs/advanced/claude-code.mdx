@@ -1,0 +1,291 @@
+---
+title: "Use with Claude Code"
+description: "Integrate your mcpkit-generated MCP servers with Claude Code"
+---
+
+## Overview
+
+Claude Code is an AI-powered coding assistant that supports the Model Context Protocol (MCP). Once you've generated an MCP server with mcpkit, you can integrate it with Claude Code to give Claude the ability to interact with websites directly from your development environment.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- Claude Code installed (available via VS Code extension or desktop app)
+- An mcpkit-generated MCP server built and ready to use
+- The absolute path to your MCP server's `dist/index.js` file
+
+<Tip>
+  If you haven't created an MCP server yet, check out our [Quickstart Guide](/quickstart) to generate your first server in minutes.
+</Tip>
+
+## Adding Your MCP Server to Claude Code
+
+### Step 1: Build Your MCP Server
+
+Navigate to your generated MCP server directory and build it:
+
+```bash
+cd mcp-stagehand-yoursite.com
+npm install
+npm run build
+```
+
+<Check>
+  Verify that the `dist/index.js` file was created successfully.
+</Check>
+
+### Step 2: Add to Claude Code
+
+Use the Claude Code CLI to add your MCP server:
+
+```bash
+claude mcp add --transport stdio "your-server-name" -- node /absolute/path/to/dist/index.js
+```
+
+Replace:
+- `your-server-name` with a descriptive name (e.g., "hackernews", "notion", "jira")
+- `/absolute/path/to/dist/index.js` with the full path to your built server
+
+<Warning>
+  Always use absolute paths when configuring MCP servers. Relative paths may not work correctly.
+</Warning>
+
+### Example
+
+```bash
+# Add a Hacker News MCP server
+claude mcp add --transport stdio "hackernews" -- node /Users/yourname/mcp-servers/mcp-stagehand-news.ycombinator.com/dist/index.js
+
+# Add a Notion MCP server
+claude mcp add --transport stdio "notion" -- node /Users/yourname/mcp-servers/mcp-stagehand-notion.so/dist/index.js
+```
+
+### Step 3: Verify Installation
+
+List your configured MCP servers:
+
+```bash
+claude mcp list
+```
+
+You should see your newly added server in the list.
+
+## Using Your MCP Server with Claude
+
+Once configured, you can interact with your MCP server through natural language in Claude Code.
+
+### Example Interactions
+
+<AccordionGroup>
+  <Accordion title="Hacker News Server" icon="newspaper">
+    ```
+    You: Search Hacker News for articles about AI agents
+
+    Claude: I'll search Hacker News for articles about AI agents.
+    [Uses the search_articles tool from your MCP server]
+
+    You: Get the top story from Hacker News right now
+
+    Claude: Let me fetch the current top story.
+    [Uses the get_top_stories tool]
+    ```
+  </Accordion>
+
+  <Accordion title="Project Management Server" icon="clipboard-check">
+    ```
+    You: Create a new task in Jira for fixing the login bug
+
+    Claude: I'll create a new Jira task for the login bug.
+    [Uses the create_task tool from your MCP server]
+
+    You: Update the status of PROJ-123 to In Progress
+
+    Claude: I'll update the task status.
+    [Uses the update_task_status tool]
+    ```
+  </Accordion>
+
+  <Accordion title="Content Platform Server" icon="book">
+    ```
+    You: Find the latest posts on my Substack about TypeScript
+
+    Claude: Let me search your Substack for TypeScript posts.
+    [Uses the search_posts tool from your MCP server]
+
+    You: Get the full content of the most recent post
+
+    Claude: I'll fetch the full content.
+    [Uses the get_post_content tool]
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Managing MCP Servers
+
+### List Configured Servers
+
+```bash
+claude mcp list
+```
+
+### Remove a Server
+
+```bash
+claude mcp remove your-server-name
+```
+
+### Update a Server
+
+To update a server after making changes:
+
+1. Rebuild your MCP server:
+   ```bash
+   cd mcp-stagehand-yoursite.com
+   npm run build
+   ```
+
+2. The changes will be automatically picked up - no need to re-add the server
+
+<Tip>
+  If you make significant changes to your MCP server, consider removing and re-adding it to ensure a clean configuration.
+</Tip>
+
+## Configuration File
+
+Claude Code stores MCP server configurations in:
+
+- **macOS/Linux**: `~/.config/claude/mcp_config.json`
+- **Windows**: `%APPDATA%\claude\mcp_config.json`
+
+You can manually edit this file if needed, but using the CLI is recommended.
+
+### Example Configuration
+
+```json
+{
+  "mcpServers": {
+    "hackernews": {
+      "command": "node",
+      "args": ["/Users/yourname/mcp-servers/mcp-stagehand-news.ycombinator.com/dist/index.js"],
+      "transport": "stdio"
+    },
+    "notion": {
+      "command": "node",
+      "args": ["/Users/yourname/mcp-servers/mcp-stagehand-notion.so/dist/index.js"],
+      "transport": "stdio"
+    }
+  }
+}
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Organize Your Servers" icon="folder">
+    Keep all your MCP servers in a dedicated directory (e.g., `~/mcp-servers/`) for easier management
+  </Card>
+
+  <Card title="Use Descriptive Names" icon="tag">
+    Choose clear, descriptive names for your servers that reflect their purpose
+  </Card>
+
+  <Card title="Document Your Tools" icon="book">
+    Add clear descriptions to your MCP tools so Claude understands when to use them
+  </Card>
+
+  <Card title="Test Regularly" icon="flask">
+    Use the MCP Inspector to test your servers before integrating with Claude Code
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Server not appearing in Claude" icon="triangle-exclamation">
+    **Solutions:**
+    - Verify the server is listed with `claude mcp list`
+    - Restart Claude Code
+    - Check that the path to `dist/index.js` is correct and absolute
+    - Ensure the server built successfully (`npm run build`)
+  </Accordion>
+
+  <Accordion title="Tools not working as expected" icon="wrench">
+    **Solutions:**
+    - Rebuild your MCP server after any changes
+    - Check server logs for errors
+    - Test with the MCP Inspector first: `npx @modelcontextprotocol/inspector node dist/index.js`
+    - Verify your Browserbase API key is valid
+  </Accordion>
+
+  <Accordion title="Authentication issues" icon="lock">
+    **Solutions:**
+    - Ensure you've created an authentication context: `mcpkit contexts create yoursite.com`
+    - Verify the context exists: `mcpkit contexts list`
+    - Try recreating the authentication context if it's expired
+  </Accordion>
+
+  <Accordion title="Server crashes or timeouts" icon="clock">
+    **Solutions:**
+    - Check your Browserbase account for session limits
+    - Increase timeout values in your MCP server configuration
+    - Ensure the target website is accessible
+    - Try reducing the number of concurrent operations
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Create More Servers"
+    icon="wand-magic-sparkles"
+    href="/commands/create"
+  >
+    Generate MCP servers for other websites
+  </Card>
+
+  <Card
+    title="Manage Contexts"
+    icon="database"
+    href="/commands/contexts"
+  >
+    Save authentication for sites that require login
+  </Card>
+
+  <Card
+    title="View Examples"
+    icon="book"
+    href="/examples/overview"
+  >
+    See example MCP servers in action
+  </Card>
+
+  <Card
+    title="Advanced Usage"
+    icon="graduation-cap"
+    href="/advanced/authentication"
+  >
+    Learn advanced authentication techniques
+  </Card>
+</CardGroup>
+
+## Get Help
+
+<CardGroup cols={2}>
+  <Card
+    title="Join Discord"
+    icon="discord"
+    href="https://discord.gg/ASQJAxzM"
+  >
+    Get help from the community
+  </Card>
+
+  <Card
+    title="GitHub Issues"
+    icon="github"
+    href="https://github.com/kevoconnell/mcpkit/issues"
+  >
+    Report bugs or request features
+  </Card>
+</CardGroup>
