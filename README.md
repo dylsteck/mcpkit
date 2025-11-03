@@ -116,7 +116,7 @@ Within the repo, run:
 npm install && npm run build && npm link
 ```
 
-Now you can run a local instance of MCPKit for testing.
+Now you can run a local instance of MCPKit for testing :)
 
 ## License
 
