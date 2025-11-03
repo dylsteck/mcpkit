@@ -4,7 +4,7 @@
 
 ## What is mcpkit?
 
-**mcpkit** is a CLI tool that generates [Stagehand](https://github.com/browserbase/stagehand) for any website.
+**mcpkit** is a CLI tool that generates [Stagehand](https://github.com/browserbase/stagehand) MCP servers for any website. With this, an LLM can do any kind of web flow.
 
 ## Quick Start
 
