@@ -30,6 +30,32 @@ export async function discoverActions(
           },
         },
         {
+          name: "execute_action",
+          description:
+            "Use an AI agent to execute any action on the current page. The agent can perform multi-step tasks, click elements, fill forms, navigate, etc.",
+          parameters: [
+            {
+              name: "instruction",
+              type: "string",
+              description:
+                "Natural language instruction for what action to perform (e.g., 'Click on the first post about AI', 'Find and click the share button', 'Navigate to settings and enable notifications')",
+              required: true,
+            },
+            {
+              name: "maxSteps",
+              type: "number",
+              description:
+                "Maximum number of steps the agent can take (default: 10)",
+              required: false,
+            },
+          ],
+          steps: [
+            "Initialize AI agent with the instruction: {instruction}",
+            "Agent autonomously executes the task within {maxSteps} steps",
+            "Return the result of the action",
+          ],
+        },
+        {
           name: "search_content",
           description: "Search for content on the website",
           parameters: [
@@ -123,6 +149,7 @@ ${exampleJSON}
 
 IMPORTANT REQUIREMENTS:
 - ALWAYS include a "get_page_info" action as the FIRST action (with empty parameters and steps arrays)
+- ALWAYS include an "execute_action" action as the SECOND action (allows performing arbitrary actions on the website)
 - Focus on MULTI-STEP workflows that combine multiple UI interactions
 - Each action should have 4-8 steps minimum (not just 1-2 steps)
 - Break down complex workflows into detailed, atomic steps
@@ -140,9 +167,9 @@ RULES:
   - Example: "Type {query} into search field" or "Click on {sectionName} link"
   - Break workflows into detailed steps (click button, wait for dialog, type text, select options, click save, etc.)
   - Each step should be a single, atomic UI interaction
-  - Include 4-8 steps per action for thorough coverage
+  - Include 4-10 steps per action for thorough coverage
 - extractionSchema: REQUIRED for data retrieval actions, optional for create/update actions
-- Focus on 7-12 most useful and realistic actions (including get_page_info)
+- Focus on 5-8 most useful and realistic actions (including get_page_info)
 - Make sure steps are specific, detailed, and actionable
 
 EXAMPLE MULTI-STEP WORKFLOWS:
@@ -167,8 +194,9 @@ EXPLORATION APPROACH:
 5. Identify complete, multi-step workflows that users would want automated
 
 FIRST: Include "get_page_info" action with empty parameters and steps arrays.
+SECOND: Include "execute_action" action to allow performing arbitrary actions on the website.
 
-THEN: Identify 7-12 most useful MULTI-STEP actions that users would want to automate. Focus on:
+THEN: Identify 5-8 most useful MULTI-STEP actions that users would want to automate. Focus on:
 - Complete workflows (create → edit → publish, search → filter → select → interact)
 - CRUD operations with detailed, atomic steps
 - Data retrieval with comprehensive extraction schemas
