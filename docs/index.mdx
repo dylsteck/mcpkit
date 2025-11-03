@@ -22,10 +22,6 @@ description: "Generate MCP servers for any website with AI-powered browser autom
   <Card title="Generate MCP Servers" icon="wand-magic-sparkles">
     Automatically create MCP servers by analyzing any website's functionality
   </Card>
-  <Card title="Powered by Browserbase" icon="browser">
-    Run browser automation anywhere with just an API key - no local browser
-    required
-  </Card>
   <Card title="AI-Powered Discovery" icon="robot">
     Automatically detect and document website actions using AI
   </Card>
@@ -45,21 +41,16 @@ Get up and running in minutes:
     ```
   </Step>
 
-{" "}
+  <Step title="Set up credentials">
+    ```bash
+    mcpkit secrets
+    ```
 
-<Step title="Set up credentials">
-
-```bash
-mcpkit secrets
-```
-
-You'll need:
-
-- Browserbase API key and Project ID ([get one here](https://www.browserbase.com))
-- LLM API key (Gemini, OpenAI, etc.)
-- LLM provider model name (ex: google/gemini-2.5-pro)
-
-</Step>
+    You'll need:
+    - Browserbase API key and Project ID ([get here!](https://www.browserbase.com))
+    - LLM API key (Gemini, OpenAI, etc.)
+    - LLM provider model name (ex: google/gemini-2.5-pro)
+  </Step>
 
   <Step title="Create your first MCP server">
     ```bash
