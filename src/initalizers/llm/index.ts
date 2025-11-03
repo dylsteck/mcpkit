@@ -2,6 +2,7 @@ import { loadEnv } from "../../config/env.js";
 import { openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
+import { xai } from "@ai-sdk/xai";
 import { LanguageModel } from "ai";
 
 let cachedModel: LanguageModel | null = null;
@@ -34,6 +35,9 @@ export function getModel(): LanguageModel {
   } else if (MODEL_PROVIDER.startsWith("google/")) {
     const modelName = MODEL_PROVIDER.replace("google/", "");
     cachedModel = google(modelName);
+  } else if (MODEL_PROVIDER.startsWith("xai/")) {
+    const modelName = MODEL_PROVIDER.replace("xai/", "");
+    cachedModel = xai(modelName);
   } else {
     throw new Error(
       `Unsupported model provider: ${MODEL_PROVIDER}. Must start with openai/, anthropic/, or google/`

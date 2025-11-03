@@ -66,7 +66,8 @@ export async function setupSecrets(options?: {
       Object.entries(existingConfig).forEach(([key, value]) => {
         const displayValue =
           key.includes("KEY") || key.includes("TOKEN")
-            ? value.substring(0, 8) + "..."
+            ? //replace all with ****, also only show first 8 characters and last 4 characters
+              value.slice(0, 8).replace(/./g, "*")
             : value;
         console.log(`  ${key}=${displayValue}`);
       });
