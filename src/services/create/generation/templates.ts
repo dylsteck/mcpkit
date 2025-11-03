@@ -2,6 +2,7 @@ import type { DiscoveredAction } from "../schemas/index.js";
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { loadContextId } from "../../session/index.js";
 
@@ -234,20 +235,28 @@ export function generateTsConfig(): string {
  * Generic function to load an example MCP server file
  */
 async function loadExampleFile(exampleName: string): Promise<string> {
-  const exampleFilePath = path.join(
-    process.cwd(),
-    "examples",
-    exampleName,
-    "src",
-    "index.ts"
-  );
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
 
-  try {
-    return await fs.readFile(exampleFilePath, "utf-8");
-  } catch (error) {
-    console.warn(`⚠️  Could not read ${exampleName} example file`);
-    return `// ${exampleName} example not available`;
+  //this is so it works locally and when installed as a package
+  const possiblePaths = [
+    //when installed as a package: examples-src/{name}.ts
+    path.resolve(__dirname, "../../../../examples-src", `${exampleName}.ts`),
+    //when running in development: examples-src/{name}.ts
+    path.join(process.cwd(), "examples-src", `${exampleName}.ts`),
+  ];
+
+  for (const exampleFilePath of possiblePaths) {
+    try {
+      return await fs.readFile(exampleFilePath, "utf-8");
+    } catch (error) {
+      // Continue to next path
+      continue;
+    }
   }
+
+  console.warn(`⚠️  Could not read ${exampleName} example file`);
+  return `// ${exampleName} example not available`;
 }
 
 /**

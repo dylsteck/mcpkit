@@ -1,6 +1,6 @@
 {
   "name": "@kevinoconnell/mcpkit",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "publishConfig": {
     "access": "public"
   },
@@ -8,8 +8,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcpkit": "dist/cli.js",
-    "mcpkit-server": "dist/mcp/server.js"
+    "mcpkit": "dist/cli.js"
   },
   "scripts": {
     "dev": "tsx watch src/cli.ts",
@@ -39,6 +38,7 @@
   "homepage": "https://github.com/kevinoconnell/mcpkit#readme",
   "files": [
     "dist",
+    "examples-src",
     "README.md",
     "LICENSE"
   ],
